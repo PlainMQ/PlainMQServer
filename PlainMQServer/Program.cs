@@ -1,57 +1,17 @@
 ﻿using PlainMQServer.Models;
+using PlainMQServer.Services;
 using PlainMQServer.ThreadManagement;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 
-TcpListener server;
-List<NetworkStream> Connections = new List<NetworkStream>();
-bool shutdown = false;
-int globalBroadcastID = 1;
+string[] cmdArgs = Environment.GetCommandLineArgs();
+
+MainService Main = new(cmdArgs);
 
 ManagedThreadPool.Init();
 
-ManagedThreadBase Main = new ManagedThreadBase
+ManagedThreadBase MainThread = new()
 {
-    Action = (object? o) =>
-    {
-        Int32 port = 13000;
-        IPAddress localhost = IPAddress.Parse("127.0.0.1");
-        server = new TcpListener(localhost, port);
-        server.Start();
-
-        Console.WriteLine("Server started...");
-
-        if (o == null)
-            throw new ApplicationException("Starting main method with null event - shameful");
-
-        ThreadEvent te = (ThreadEvent)o;
-
-        if (te.EventPayload == null)
-            throw new ApplicationException("Starting main method with incorrect event type - more shameful");
-
-        PlainMessage pMsg = (PlainMessage)te.EventPayload;
-
-        Console.WriteLine(Encoding.UTF8.GetString(pMsg.BODY == null ? new byte[0] : pMsg.BODY));
-
-        while (!shutdown)
-        {
-            TcpClient client = server.AcceptTcpClient();
-
-            NetworkStream networkStream = client.GetStream();
-
-            Console.WriteLine($"Connection received - {networkStream.Socket.RemoteEndPoint}");
-
-            NetworkStreamManagedQueueThread nStreamThread = new NetworkStreamManagedQueueThread(networkStream);
-            nStreamThread.ID = globalBroadcastID++;
-            nStreamThread.Name = $"CONN|{networkStream.Socket.RemoteEndPoint}";
-
-            ManagedThreadPool.AddToPool(nStreamThread);
-
-            Thread readThread = new Thread(() => ReadFromStream(nStreamThread));
-            readThread.Start();
-        }
-    },
+    Action = (object? o) => Main?.MainAction?.Invoke(o),
 
     ID = 0,
 
@@ -59,47 +19,10 @@ ManagedThreadBase Main = new ManagedThreadBase
     Name = "MainThread",
 };
 
-ManagedThreadPool.AddToPool(Main);
+ManagedThreadPool.AddToPool(MainThread);
 
 ManagedThreadPool.Broadcast(new ThreadEvent
 {
     Class = PlainMQServer.Models.Enums.ThreadClass.MAIN,
-    EventPayload = new PlainMessage(Encoding.UTF8.GetBytes("INTITED"))
+    EventPayload = new PlainMessage(Encoding.UTF8.GetBytes("INITED"))
 });
-
-void ReadFromStream(NetworkStreamManagedQueueThread nStreamThread)
-{
-    try
-    {
-        int i;
-        byte[] lenByte = new byte[sizeof(int)];
-
-        while ((i = nStreamThread.NStream.Read(lenByte)) != 0)
-        {
-            if (i != sizeof(int))
-                throw new Exception("unhandled message type");
-
-            PlainMessage pMsg = new PlainMessage(BitConverter.ToInt32(lenByte));
-
-            if(pMsg.BODY != null)
-            {
-                nStreamThread.NStream.Read(pMsg.BODY, 0, pMsg.LENGTH);
-
-                ManagedThreadPool.Broadcast(new ThreadEvent
-                {
-                    InitiatorID = nStreamThread.ID,
-                    Class = PlainMQServer.Models.Enums.ThreadClass.BROADCAST,
-                    EventPayload = pMsg
-                });
-
-                nStreamThread.NStream.Flush();
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Connection lost from {nStreamThread.NStream.Socket.RemoteEndPoint} ex - {ex.Message}");
-        ManagedThreadPool.RemoveFromPool(nStreamThread);
-        nStreamThread.Dispose();
-    }
-}
