@@ -1,74 +1,94 @@
 ﻿using PlainMQServer.Models;
+using PlainMQServer.ThreadManagement;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 TcpListener server = null;
 List<NetworkStream> Connections = new List<NetworkStream>();
+bool shutdown = false;
+int globalBroadcastID = 1;
 
-try
+ManagedThreadPool.Init();
+
+ManagedThreadBase Main = new ManagedThreadBase
 {
-    Int32 port = 13000;
-    IPAddress localhost = IPAddress.Parse("127.0.0.1");
-    server = new TcpListener(localhost, port);
-    server.Start();
-
-    Console.WriteLine("Server started...");
-
-    bool terminate = false;
-
-    while(!terminate)
+    Action = (object? o) =>
     {
-        TcpClient client = server.AcceptTcpClient();
+        Int32 port = 13000;
+        IPAddress localhost = IPAddress.Parse("127.0.0.1");
+        server = new TcpListener(localhost, port);
+        server.Start();
 
-        NetworkStream networkStream = client.GetStream();
-        Connections.Add(networkStream);
+        Console.WriteLine("Server started...");
 
-        Console.WriteLine($"Connection received - {networkStream.Socket.RemoteEndPoint}");
+        ThreadEvent te = (ThreadEvent)o;
+        PlainMessage pMsg = (PlainMessage)te.EventPayload;
 
-        Thread readThread = new Thread(() => ReadFromStream(networkStream));
-        readThread.Start();
-    }
+        Console.WriteLine(Encoding.UTF8.GetString(pMsg.BODY));
 
-}
-catch(Exception ex)
+        while (!shutdown)
+        {
+            TcpClient client = server.AcceptTcpClient();
+
+            NetworkStream networkStream = client.GetStream();
+
+            Console.WriteLine($"Connection received - {networkStream.Socket.RemoteEndPoint}");
+
+            NetworkStreamManagedQueueThread nStreamThread = new NetworkStreamManagedQueueThread(networkStream);
+            nStreamThread.ID = globalBroadcastID++;
+            nStreamThread.Name = $"CONN|{networkStream.Socket.RemoteEndPoint}";
+
+            ManagedThreadPool.AddToPool(nStreamThread);
+
+            Thread readThread = new Thread(() => ReadFromStream(nStreamThread));
+            readThread.Start();
+        }
+    },
+
+    ID = 0,
+
+    InvokeClass = PlainMQServer.Models.Enums.ThreadClass.MAIN,
+    Name = "MainThread",
+};
+
+ManagedThreadPool.AddToPool(Main);
+
+ManagedThreadPool.Broadcast(new ThreadEvent
 {
-    Console.WriteLine(ex.ToString());
-}
+    Class = PlainMQServer.Models.Enums.ThreadClass.MAIN,
+    EventPayload = new PlainMessage(Encoding.UTF8.GetBytes("INTITED"), 7)
+});
 
-
-void ReadFromStream(NetworkStream nStream)
+void ReadFromStream(NetworkStreamManagedQueueThread nStreamThread)
 {
     try
     {
         int i;
-        byte[] lenByte = new byte[sizeof(int)];        
+        byte[] lenByte = new byte[sizeof(int)];
 
-        while((i = nStream.Read(lenByte)) != 0)
+        while ((i = nStreamThread.NStream.Read(lenByte)) != 0)
         {
             if (i != sizeof(int))
-                throw new Exception("unhandled message type");            
+                throw new Exception("unhandled message type");
 
-            PlainMessage pMsg = new PlainMessage(BitConverter.ToInt32(lenByte));           
+            PlainMessage pMsg = new PlainMessage(BitConverter.ToInt32(lenByte));
 
-            nStream.Read(pMsg.BODY, 0, pMsg.LENGTH);
+            nStreamThread.NStream.Read(pMsg.BODY, 0, pMsg.LENGTH);
 
-            Broadcast(pMsg);
-            nStream.Flush();
+            ManagedThreadPool.Broadcast(new ThreadEvent
+            {
+                InitiatorID = nStreamThread.ID,
+                Class = PlainMQServer.Models.Enums.ThreadClass.BROADCAST,
+                EventPayload = pMsg
+            });
+
+            nStreamThread.NStream.Flush();
         }
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
-        Console.WriteLine($"Connection lost from {nStream.Socket.RemoteEndPoint}");
-        Connections.Remove(nStream);
+        Console.WriteLine($"Connection lost from {nStreamThread.NStream.Socket.RemoteEndPoint}");
+        Connections.Remove(nStreamThread.NStream);
     }
-}
-
-void Broadcast(PlainMessage pMsg)
-{
-    Connections.AsParallel()
-        .ForAll((nStream) =>
-        {
-            if(nStream.CanWrite)
-                nStream.Write(pMsg.ToMessageBytes());
-        });
 }

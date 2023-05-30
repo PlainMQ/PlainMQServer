@@ -2,10 +2,16 @@
 
 namespace PlainMQServer.Models
 {
+    public enum MessageDirection
+    {
+        Read,
+        Write
+    }
+
     public struct PlainMessage
     {
         public int LENGTH;
-        public byte[] BODY;
+        public byte[]? BODY;
 
         public byte[] ToMessageBytes()
         {
@@ -30,5 +36,4 @@ namespace PlainMQServer.Models
             BODY = new byte[LENGTH];
         }
     }
-
 }

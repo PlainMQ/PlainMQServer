@@ -4,6 +4,7 @@
     {
         MAIN,
         BROADCAST,
-        LOGGER
+        LOGGER,
+        TERMINATE
     }
 }

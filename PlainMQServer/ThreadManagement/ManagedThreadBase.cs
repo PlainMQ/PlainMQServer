@@ -4,29 +4,32 @@ using System.ComponentModel;
 
 namespace PlainMQServer.ThreadManagement
 {
-    public class ManagedThread : IManagedThread
+    public class ManagedThreadBase : IManagedThread
     {
-        public ManagedThreadStatus Status { get; private set; }
+        public ManagedThreadStatus Status { get; set; }
 
         public ParameterizedThreadStart Action { get; set; }
 
         public ThreadClass InvokeClass { get; set; }
 
+        public ThreadClass CancelClass { get; } = ThreadClass.TERMINATE;
+
         public int ID { get; set; }
         public string Name { get; set; }
 
-        private Thread _thread { get; set; }
+        internal Thread _thread { get; set; }
 
-        public void ThreadAction(object? o)
+        public virtual void ThreadAction()
         {
-            var state = ManagedThreadStatus.IDLE;
-
             ManagedThreadPool.GlobalEventQueue.QueueChange += (object sender, CollectionChangeEventArgs args) =>
             {
-                var ubEvent = (ThreadEvent)args.Element;
+                ThreadEvent ubEvent = (ThreadEvent)args.Element;
 
                 if (ubEvent.Class == InvokeClass)
-                    Action.Invoke(ubEvent);
+                {
+                    _thread = new Thread(() => Action.Invoke(ubEvent));
+                    _thread.Start();
+                }                
             };
 
         }
