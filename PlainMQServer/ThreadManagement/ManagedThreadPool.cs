@@ -29,6 +29,15 @@ namespace PlainMQServer.ThreadManagement
 
         }
 
+        internal static bool RemoveFromPool(IManagedThread t)
+        {
+            if(_pool != null && t != null)
+            {
+                return _pool.TryRemove(t.ID, out _);
+            }
+            else throw new Exception("ManagedThreadPool is null somehow");
+        }
+
         internal static bool Broadcast(ThreadEvent tEvent)
         {
             GlobalEventQueue.Enqueue(tEvent);

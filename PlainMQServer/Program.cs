@@ -27,7 +27,7 @@ ManagedThreadBase Main = new ManagedThreadBase
 
         ThreadEvent te = (ThreadEvent)o;
 
-        if (te == null)
+        if (te.EventPayload == null)
             throw new ApplicationException("Starting main method with incorrect event type - more shameful");
 
         PlainMessage pMsg = (PlainMessage)te.EventPayload;
@@ -99,6 +99,7 @@ void ReadFromStream(NetworkStreamManagedQueueThread nStreamThread)
     catch (Exception ex)
     {
         Console.WriteLine($"Connection lost from {nStreamThread.NStream.Socket.RemoteEndPoint} ex - {ex.Message}");
+        ManagedThreadPool.RemoveFromPool(nStreamThread);
         nStreamThread.Dispose();
     }
 }
