@@ -3,6 +3,11 @@ using System.Net.Sockets;
 
 namespace PlainMQServer.ThreadManagement
 {
+    /// <summary>
+    /// Specialization of a ManagedQueueThread which has a NetworkStream as a property.
+    /// 
+    /// Desired functionality is to write to the resident NetworkStream
+    /// </summary>
     internal class NetworkStreamManagedQueueThread : ManagedQueueThread, IDisposable
     {
         internal NetworkStream NStream { get; set; }
@@ -32,6 +37,7 @@ namespace PlainMQServer.ThreadManagement
                     {
                         PlainMessage msg = (PlainMessage)obj.EventPayload;
                         NStream.Write(msg.ToMessageBytes());
+                        NStream.Flush();
                     }
                 }
                 else
@@ -43,7 +49,7 @@ namespace PlainMQServer.ThreadManagement
         }
 
         public void Dispose()
-        {
+        {            
             NStream?.Dispose();
         }
     }

@@ -1,5 +1,8 @@
 ﻿namespace PlainMQServer.Models.Enums
 {
+    /// <summary>
+    /// Enum used for matching execution of ManagedThreads with GlobalEventQueue events
+    /// </summary>
     public enum ThreadClass
     {
         MAIN,

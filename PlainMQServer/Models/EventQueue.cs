@@ -3,6 +3,10 @@ using System.ComponentModel;
 
 namespace PlainMQServer.Models
 {
+    /// <summary>
+    /// Simple event bound queue to be used in the context of the GlobalEventQueue
+    /// </summary>
+    /// <typeparam name="T">Type of object found in the EventQueue</typeparam>
     public class EventQueue<T>
     {
         public ConcurrentQueue<T> Queue { get; set; }

@@ -3,6 +3,13 @@ using System.ComponentModel;
 
 namespace PlainMQServer.ThreadManagement
 {
+    /// <summary>
+    /// Specialization of a ManagedThreadBase which maintains an internal queue
+    /// This queue will then trigger a Local Action with the idea of events being processed
+    /// in the local queue.
+    /// 
+    /// On creation, each thread will manage it's own LocalQueue
+    /// </summary>
     internal class ManagedQueueThread : ManagedThreadBase
     {
         internal Queue<ThreadEvent> LocalQueue { get; set; }        
@@ -42,6 +49,9 @@ namespace PlainMQServer.ThreadManagement
             };
         }
 
+        /// <summary>
+        /// The Action that occurs when an item is added to the LocalQueue
+        /// </summary>
         public Action<ThreadEvent> QueueAction { get; set; }
 
 

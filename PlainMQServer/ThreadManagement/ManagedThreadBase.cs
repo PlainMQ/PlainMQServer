@@ -4,6 +4,13 @@ using System.ComponentModel;
 
 namespace PlainMQServer.ThreadManagement
 {
+    /// <summary>
+    /// Base Class for ManagedThreads containing a ThreadAction which is executable on the
+    /// specified event on the global event queue.
+    /// 
+    /// Execution of the ThreadAction is dependent on whether the class of the GlobalEventQueue entry 
+    /// matches the class of the created ManagedThread
+    /// </summary>
     public class ManagedThreadBase : IManagedThread
     {
         public ManagedThreadStatus Status { get; set; }

@@ -57,7 +57,7 @@ ManagedThreadPool.AddToPool(Main);
 ManagedThreadPool.Broadcast(new ThreadEvent
 {
     Class = PlainMQServer.Models.Enums.ThreadClass.MAIN,
-    EventPayload = new PlainMessage(Encoding.UTF8.GetBytes("INTITED"), 7)
+    EventPayload = new PlainMessage(Encoding.UTF8.GetBytes("INTITED"))
 });
 
 void ReadFromStream(NetworkStreamManagedQueueThread nStreamThread)
@@ -89,6 +89,6 @@ void ReadFromStream(NetworkStreamManagedQueueThread nStreamThread)
     catch (Exception ex)
     {
         Console.WriteLine($"Connection lost from {nStreamThread.NStream.Socket.RemoteEndPoint}");
-        Connections.Remove(nStreamThread.NStream);
+        nStreamThread.Dispose();
     }
 }
