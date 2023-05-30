@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PlainMQServer": {
+      "commandName": "Project",
+      "commandLineArgs": "--port=13000"
+    }
+  }
+}
