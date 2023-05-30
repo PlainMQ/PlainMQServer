@@ -19,9 +19,9 @@ If you have these setup in your environment you should just be able to clone the
 
 There are some arguments that are used in the setup of the server. These are:
 
-- "port=x" _run the server at this specified port_
-- "addr=x" _run ther server at this specified address_
-- "timeout=x" _not used currently_
+- "--port=x" _run the server at this specified port_
+- "--addr=x" _run ther server at this specified address_
+- "--timeout=x" _not used currently_
 
 ### Executable
 
