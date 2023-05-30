@@ -28,8 +28,9 @@ There are some arguments that are used in the setup of the server. These are:
 #### Windows
 
 1. Navigate to the [Releases Page](https://github.com/PlainMQ/PlainMQServer/releases)
-1. Download the zip file
-1. Run the following command `.\PlainMQServer.exe --port={your port} --addr={your address} --timeout={your timeout value}`
+1. Download the zip file and extract
+2. Open up your terminal of choice at the extracted location
+3. Run the following command `.\PlainMQServer.exe --port={your port} --addr={your address} --timeout={your timeout value}`
 
 ### Docker Image
 
