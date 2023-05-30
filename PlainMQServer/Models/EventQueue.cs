@@ -16,6 +16,12 @@ namespace PlainMQServer.Models
         public EventQueue()
         {
             Queue = new ConcurrentQueue<T>();
+            QueueChange += EventQueue_QueueChange;
+        }
+
+        private void EventQueue_QueueChange(object? sender, CollectionChangeEventArgs e)
+        {
+            //initialization purposes only
         }
 
         public void Enqueue(T obj)

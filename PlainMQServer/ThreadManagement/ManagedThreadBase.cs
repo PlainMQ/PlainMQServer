@@ -15,26 +15,29 @@ namespace PlainMQServer.ThreadManagement
     {
         public ManagedThreadStatus Status { get; set; }
 
-        public ParameterizedThreadStart Action { get; set; }
+        public ParameterizedThreadStart? Action { get; set; }
 
         public ThreadClass InvokeClass { get; set; }
 
         public ThreadClass CancelClass { get; } = ThreadClass.TERMINATE;
 
         public int ID { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        internal Thread _thread { get; set; }
+        internal Thread? _thread { get; set; }
 
         public virtual void ThreadAction()
         {
-            ManagedThreadPool.GlobalEventQueue.QueueChange += (object sender, CollectionChangeEventArgs args) =>
+            ManagedThreadPool.GlobalEventQueue.QueueChange += (object? sender, CollectionChangeEventArgs args) =>
             {
+                if (args.Element == null)
+                    throw new InvalidDataException("Failed to subscribe to GlobalEventQueue");
+
                 ThreadEvent ubEvent = (ThreadEvent)args.Element;
 
                 if (ubEvent.Class == InvokeClass)
                 {
-                    _thread = new Thread(() => Action.Invoke(ubEvent));
+                    _thread = new Thread(() => Action?.Invoke(ubEvent));
                     _thread.Start();
                 }                
             };

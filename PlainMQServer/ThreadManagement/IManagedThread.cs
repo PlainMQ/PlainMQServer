@@ -13,11 +13,11 @@ namespace PlainMQServer.ThreadManagement
 
         public ManagedThreadStatus Status { get; internal set; }
 
-        public ParameterizedThreadStart Action { get; set; }
+        public ParameterizedThreadStart? Action { get; set; }
 
         public ThreadClass InvokeClass { get; set; }
 
         public int ID { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

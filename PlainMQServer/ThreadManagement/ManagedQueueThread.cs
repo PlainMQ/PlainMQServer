@@ -26,7 +26,7 @@ namespace PlainMQServer.ThreadManagement
                     {
                         if(LocalQueue.Any())
                         {
-                            QueueAction.Invoke(LocalQueue.Dequeue());
+                            QueueAction?.Invoke(LocalQueue.Dequeue());
                         }
                     }
                 }
@@ -40,6 +40,9 @@ namespace PlainMQServer.ThreadManagement
         {
             ManagedThreadPool.GlobalEventQueue.QueueChange += (object? sender, CollectionChangeEventArgs args) =>
             {
+                if (args.Element == null)
+                    throw new InvalidDataException("Failed to subscribe to GlobalEventQueue");
+
                 ThreadEvent ubEvent = (ThreadEvent)args.Element;
 
                 if (ubEvent.Class == InvokeClass && ubEvent.InitiatorID != ID)
@@ -52,7 +55,7 @@ namespace PlainMQServer.ThreadManagement
         /// <summary>
         /// The Action that occurs when an item is added to the LocalQueue
         /// </summary>
-        public Action<ThreadEvent> QueueAction { get; set; }
+        public Action<ThreadEvent>? QueueAction { get; set; }
 
 
     }

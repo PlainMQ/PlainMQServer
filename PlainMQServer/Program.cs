@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-TcpListener server = null;
+TcpListener server;
 List<NetworkStream> Connections = new List<NetworkStream>();
 bool shutdown = false;
 int globalBroadcastID = 1;
@@ -22,10 +22,17 @@ ManagedThreadBase Main = new ManagedThreadBase
 
         Console.WriteLine("Server started...");
 
+        if (o == null)
+            throw new ApplicationException("Starting main method with null event - shameful");
+
         ThreadEvent te = (ThreadEvent)o;
+
+        if (te == null)
+            throw new ApplicationException("Starting main method with incorrect event type - more shameful");
+
         PlainMessage pMsg = (PlainMessage)te.EventPayload;
 
-        Console.WriteLine(Encoding.UTF8.GetString(pMsg.BODY));
+        Console.WriteLine(Encoding.UTF8.GetString(pMsg.BODY == null ? new byte[0] : pMsg.BODY));
 
         while (!shutdown)
         {
@@ -74,21 +81,24 @@ void ReadFromStream(NetworkStreamManagedQueueThread nStreamThread)
 
             PlainMessage pMsg = new PlainMessage(BitConverter.ToInt32(lenByte));
 
-            nStreamThread.NStream.Read(pMsg.BODY, 0, pMsg.LENGTH);
-
-            ManagedThreadPool.Broadcast(new ThreadEvent
+            if(pMsg.BODY != null)
             {
-                InitiatorID = nStreamThread.ID,
-                Class = PlainMQServer.Models.Enums.ThreadClass.BROADCAST,
-                EventPayload = pMsg
-            });
+                nStreamThread.NStream.Read(pMsg.BODY, 0, pMsg.LENGTH);
 
-            nStreamThread.NStream.Flush();
+                ManagedThreadPool.Broadcast(new ThreadEvent
+                {
+                    InitiatorID = nStreamThread.ID,
+                    Class = PlainMQServer.Models.Enums.ThreadClass.BROADCAST,
+                    EventPayload = pMsg
+                });
+
+                nStreamThread.NStream.Flush();
+            }
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Connection lost from {nStreamThread.NStream.Socket.RemoteEndPoint}");
+        Console.WriteLine($"Connection lost from {nStreamThread.NStream.Socket.RemoteEndPoint} ex - {ex.Message}");
         nStreamThread.Dispose();
     }
 }

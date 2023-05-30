@@ -25,7 +25,7 @@ namespace PlainMQServer.Models
             byte[] ret = new byte[LENGTH + sizeof(int)];
 
             BitConverter.GetBytes(LENGTH).CopyTo(ret, 0);
-            BODY.CopyTo(ret, sizeof(int));
+            BODY?.CopyTo(ret, sizeof(int));
 
             return ret;
         }
