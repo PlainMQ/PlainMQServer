@@ -39,7 +39,7 @@ Thank you for scrolling to this section and registering your visual interest. Al
 
 All merging to the master branch is done via Pull Requests.
 
-Any further questions can be directed towards the project email or discord server chat.
+Any further questions can be directed towards the project email or [discord channel](https://discord.com/channels/1113097416082735225/1113097416577658913).
 
 ## Consuming
 
@@ -51,5 +51,7 @@ Various consuming clients are in various stages of development, you can access t
 - [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java)
 
 ## Contact
+
+Feel free to post a [repository issue](https://github.com/PlainMQ/PlainMQServer/issues) should you have a question or concern about the project or send a friendly message to the organization's email.
 
 ## FAQ
