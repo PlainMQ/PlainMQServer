@@ -45,10 +45,10 @@ Any further questions can be directed towards the project email or discord serve
 
 Various consuming clients are in various stages of development, you can access these here:
 
-- [C# Client & Examples](https://github.com/PlainMQ/PlainMQ.Net)
-- [GO Client & Examples](https://github.com/PlainMQ/PlainMQ.GO)
-- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node)
-- [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java)
+- [C# Client & Examples](https://github.com/PlainMQ/PlainMQ.Net) | Partial completion
+- [GO Client & Examples](https://github.com/PlainMQ/PlainMQ.GO) | to be done
+- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node) | to be done
+- [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java) | to be done
 
 ## Contact
 
