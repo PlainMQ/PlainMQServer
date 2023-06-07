@@ -10,40 +10,60 @@ namespace PlainMQServer.ThreadManagement
     /// </summary>
     internal class NetworkStreamManagedQueueThread : ManagedQueueThread, IDisposable
     {
+        int currentWait = 2;
         internal NetworkStream NStream { get; set; }
 
         public NetworkStreamManagedQueueThread(NetworkStream nStream)
         {
             NStream = nStream;
             InvokeClass = Models.Enums.ThreadClass.BROADCAST;
-            Action = (object? o) =>
+            QueueAction = (ThreadEvent te) =>
             {
-                ThreadMethod();
+                ThreadMethod(te);
             };
 
-            _thread = new Thread(() => Action.Invoke(nStream));
-            _thread.Start();
+            //_thread = new Thread(() => Action.Invoke(nStream));
+            //_thread.Start();
         }
 
-        private void ThreadMethod()
+        private void ThreadMethod(ThreadEvent te)
         {
-            while(Status != Models.Enums.ManagedThreadStatus.ERROR)
+            try
             {
-                if (LocalQueue.Any())
-                {
-                    var obj = LocalQueue.Dequeue();
 
-                    if(obj.EventPayload is PlainMessage)
+                if (te.EventPayload is PlainMessage)
+                {
+                    PlainMessage msg = (PlainMessage)te.EventPayload;
+                    if (NStream.CanWrite)
                     {
-                        PlainMessage msg = (PlainMessage)obj.EventPayload;
                         NStream.Write(msg.ToMessageBytes());
-                        NStream.Flush();
+                        currentWait = 2;
+                    } 
+                    else if(NStream.Socket.Connected == false){
+                        NStream.Close();
+                        Status = Models.Enums.ManagedThreadStatus.ERROR;
+                    } 
+                    else {
+                        Thread.Sleep(currentWait++);
+                        ThreadMethod(te);
                     }
+                    NStream.Flush();
+                }
+                else throw new Exception("Unknown type being processed on a known type thread");            
+            }
+            catch(Exception ex)
+            {
+                if (NStream.CanWrite)
+                {
+                    Thread.Sleep(currentWait++);
+                    ThreadMethod(te);
                 }
                 else
                 {
-                    Status = Models.Enums.ManagedThreadStatus.IDLE;
-                    Thread.Sleep(10);
+                    NStream.Close();
+                    Status = Models.Enums.ManagedThreadStatus.ERROR;
+                    InvokeClass = CancelClass;
+                    Console.WriteLine($"Forcibly closed Thread: {ID}");
                 }
             }
         }
@@ -51,6 +71,7 @@ namespace PlainMQServer.ThreadManagement
         public void Dispose()
         {            
             NStream?.Dispose();
+            InvokeClass = CancelClass;
         }
     }
 }

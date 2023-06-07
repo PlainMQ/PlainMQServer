@@ -4,7 +4,7 @@
 
 # PlainMQServer
 
-PlainMQ is a multithreaded, wide-broadcast messaging queue. All other optimizations are up the the consumers. PlainMQ will provide you with what only what is necessary - everything else is up to your imagination.
+PlainMQ is a multithreaded, wide-broadcast messaging queue. All other optimizations are up the the consumers. PlainMQ will provide you with only the necessities - everything else is up to your imagination.
 
 ## Building
 
@@ -29,8 +29,8 @@ There are some arguments that are used in the setup of the server. These are:
 
 1. Navigate to the [Releases Page](https://github.com/PlainMQ/PlainMQServer/releases)
 1. Download the zip file and extract
-2. Open up your terminal of choice at the extracted location
-3. Run the following command `.\PlainMQServer.exe --port={your port} --addr={your address} --timeout={your timeout value}`
+1. Open up your terminal of choice at the extracted location
+1. Run the following command `.\PlainMQServer.exe --port={your port} --addr={your address} --timeout={your timeout value}`
 
 ### Docker Image
 
@@ -48,10 +48,10 @@ Any further questions can be directed towards the project email or [discord chan
 
 Various consuming clients are in various stages of development, you can access these here:
 
-- [C# Client & Examples](https://github.com/PlainMQ/PlainMQ.Net)
-- [GO Client & Examples](https://github.com/PlainMQ/PlainMQ.GO)
-- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node)
-- [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java)
+- [C# Client & Examples](https://github.com/PlainMQ/PlainMQ.Net) - todo
+- [GO Client & Examples](https://github.com/PlainMQ/PlainMQ.GO) - todo
+- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node) - todo
+- [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java) - todo
 
 ## Contact
 

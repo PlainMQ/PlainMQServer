@@ -84,6 +84,8 @@ namespace PlainMQServer.Services
         
         private void StartThreadLoop()
         {
+            Console.WriteLine("Starting main thread");
+            
             while (!Terminate)
             {
                 if (Server is null)
@@ -104,6 +106,8 @@ namespace PlainMQServer.Services
                 Thread readThread = new Thread(() => ReadFromStream(nStreamThread));
                 readThread.Start();
             }
+
+            Console.WriteLine("Main Thread terminated");
         }
 
         private void InitServer()
@@ -127,14 +131,17 @@ namespace PlainMQServer.Services
             try
             {
                 int i;
-                byte[] lenByte = new byte[sizeof(int)];
+                byte[] lenByte = new byte[sizeof(int) + sizeof(bool)];
 
                 while ((i = nStreamThread.NStream.Read(lenByte)) != 0)
                 {
-                    if (i != sizeof(int))
+                    if (i != (sizeof(int) + sizeof(bool)))
                         throw new Exception("unhandled message type");
 
-                    PlainMessage pMsg = new PlainMessage(BitConverter.ToInt32(lenByte));
+                    int length = BitConverter.ToInt32(new Span<byte>(lenByte, 0, sizeof(int)).ToArray());
+                    bool isStr = BitConverter.ToBoolean(new Span<byte>(lenByte, sizeof(int), 1).ToArray());
+
+                    PlainMessage pMsg = new PlainMessage(length, isStr);
 
                     if (pMsg.BODY != null)
                     {

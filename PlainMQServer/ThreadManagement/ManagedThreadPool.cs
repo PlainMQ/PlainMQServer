@@ -33,6 +33,8 @@ namespace PlainMQServer.ThreadManagement
         {
             if(_pool != null && t != null)
             {
+                t.Status = Models.Enums.ManagedThreadStatus.ERROR;
+                t.InvokeClass = Models.Enums.ThreadClass.TERMINATE;
                 return _pool.TryRemove(t.ID, out _);
             }
             else throw new Exception("ManagedThreadPool is null somehow");

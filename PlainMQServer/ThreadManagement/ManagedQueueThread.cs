@@ -1,4 +1,5 @@
 ﻿using PlainMQServer.Models;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 
 namespace PlainMQServer.ThreadManagement
@@ -12,28 +13,31 @@ namespace PlainMQServer.ThreadManagement
     /// </summary>
     internal class ManagedQueueThread : ManagedThreadBase
     {
-        internal Queue<ThreadEvent> LocalQueue { get; set; }        
+        internal ConcurrentQueue<ThreadEvent> LocalQueue { get; set; }        
 
         public ManagedQueueThread()
         {
-            LocalQueue = new Queue<ThreadEvent>();
+            LocalQueue = new ConcurrentQueue<ThreadEvent>();
 
-            Action = (object? o) =>
-            {
-                while(Status != Models.Enums.ManagedThreadStatus.ERROR)
-                {
-                    if(o is ThreadEvent)
-                    {
-                        if(LocalQueue.Any())
-                        {
-                            QueueAction?.Invoke(LocalQueue.Dequeue());
-                        }
-                    }
-                }
-            };
+            //Action = (object? o) =>
+            //{
+            //    while(Status != Models.Enums.ManagedThreadStatus.ERROR)
+            //    {
+            //        if(o is ThreadEvent)
+            //        {
+            //            if(LocalQueue.Any())
+            //            {
+            //                if(LocalQueue.TryDequeue(out var threadEvent))
+            //                {
+            //                    QueueAction?.Invoke(threadEvent);
+            //                }
+            //            }
+            //        }
+            //    }
+            //};
 
-            _thread = new Thread(Action);
-            _thread.Start();
+            //_thread = new Thread(Action);
+            //_thread.Start();
         }
 
         public override void ThreadAction()
@@ -47,7 +51,9 @@ namespace PlainMQServer.ThreadManagement
 
                 if (ubEvent.Class == InvokeClass && ubEvent.InitiatorID != ID)
                 {
-                    LocalQueue.Enqueue(ubEvent);
+                    _thread = new Thread(() => QueueAction?.Invoke(ubEvent));
+                    _thread.Start();
+                    Status = Models.Enums.ManagedThreadStatus.RUNNING;
                 }
             };
         }
