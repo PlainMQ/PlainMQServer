@@ -4,7 +4,7 @@
 
 # PlainMQServer
 
-PlainMQ is a multithreaded, wide-broadcast messaging queue. All other optimizations are up the the consumers. PlainMQ will provide you with only the necessities - everything else is up to your imagination.
+PlainMQ is a multithreaded, wide-broadcast messaging queue. All other optimizations are up the the consumers. PlainMQ will provide you with what only what is necessary - everything else is up to your imagination.
 
 ## Building
 
@@ -29,12 +29,9 @@ There are some arguments that are used in the setup of the server. These are:
 
 1. Navigate to the [Releases Page](https://github.com/PlainMQ/PlainMQServer/releases)
 1. Download the zip file and extract
-1. Open up your terminal of choice at the extracted location
-1. Run the following command `.\PlainMQServer.exe --port={your port} --addr={your address} --timeout={your timeout value}`
+2. Open up your terminal of choice at the extracted location
+3. Run the following command `.\PlainMQServer.exe --port={your port} --addr={your address} --timeout={your timeout value}`
 
-### Docker Image
-
-todo
 
 ## Contributing
 
@@ -42,19 +39,17 @@ Thank you for scrolling to this section and registering your visual interest. Al
 
 All merging to the master branch is done via Pull Requests.
 
-Any further questions can be directed towards the project email or [discord channel](https://discord.com/channels/1113097416082735225/1113097416577658913).
+Any further questions can be directed towards the project email or discord server chat.
 
 ## Consuming
 
 Various consuming clients are in various stages of development, you can access these here:
 
-- [C# Client & Examples](https://github.com/PlainMQ/PlainMQ.Net) - todo
-- [GO Client & Examples](https://github.com/PlainMQ/PlainMQ.GO) - todo
-- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node) - todo
-- [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java) - todo
+- [C# Client & Examples](https://github.com/PlainMQ/PlainMQ.Net) | Partial completion
+- [GO Client & Examples](https://github.com/PlainMQ/PlainMQ.GO) | to be done
+- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node) | to be done
+- [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java) | to be done
 
 ## Contact
 
-Feel free to post a [repository issue](https://github.com/PlainMQ/PlainMQServer/issues) should you have a question or concern about the project or send a friendly message to the organization's email.
-
-## FAQ
+Please feel free to create an [issue](https://github.com/PlainMQ/PlainMQServer/issues) or add something to the [discussion](https://github.com/PlainMQ/PlainMQServer/discussions)
