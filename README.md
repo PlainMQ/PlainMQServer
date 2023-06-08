@@ -47,7 +47,7 @@ Various consuming clients are in various stages of development, you can access t
 
 - [C# Client & Examples](https://github.com/PlainMQ/PlainMQ.Net) | Partial completion
 - [GO Client & Examples](https://github.com/PlainMQ/PlainMQ.GO) | to be done
-- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node) | to be done
+- [NodeJS Client & Examples](https://github.com/PlainMQ/PlainMQ.Node) | Partial completion
 - [Java Client & Examples](https://github.com/PlainMQ/PlainMQ.Java) | to be done
 
 ## Contact
